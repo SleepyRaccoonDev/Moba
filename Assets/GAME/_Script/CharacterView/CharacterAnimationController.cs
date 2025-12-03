@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class CharacterAnimationController : IViewBehaviour
 {
+    private const string HitAnimationName = "Zombie Reaction Hit";
+    private const string HitTriggerName = "IsHeated";
+    private const string DieBoolName = "IsDied";
+    private const string VelocityXName = "VelocityX";
+    private const string VelocityYName = "VelocityZ";
+
     private Character _character;
     private Animator _animator;
 
@@ -40,7 +46,7 @@ public class CharacterAnimationController : IViewBehaviour
     {
         if (_isHitPlaying)
         {
-            if (state.IsName("Zombie Reaction Hit") && state.normalizedTime >= 1f)
+            if (state.IsName(HitAnimationName) && state.normalizedTime >= 1f)
             {
                 _isHitPlaying = false;
                 _character.ResetDamageFlag();
@@ -51,7 +57,7 @@ public class CharacterAnimationController : IViewBehaviour
 
         if (_character.IsTakedDamage)
         {
-            _animator.SetTrigger("IsHeated");
+            _animator.SetTrigger(HitTriggerName);
             _isHitPlaying = true;
             return true;
         }
@@ -63,7 +69,7 @@ public class CharacterAnimationController : IViewBehaviour
     {
         if (_character.CurrentHP <= 0)
         {
-            _animator.SetBool("IsDied", true);
+            _animator.SetBool(DieBoolName, true);
             SetDeadState();
             return true;
         }
@@ -82,11 +88,11 @@ public class CharacterAnimationController : IViewBehaviour
         var velocity = _character.Rigidbody.velocity;
 
         float angle = Vector3.Dot(_character.transform.forward, velocity.normalized);
-        _animator.SetFloat("VelocityX", velocity.magnitude * angle);
+        _animator.SetFloat(VelocityXName, velocity.magnitude * angle);
 
         var cross = Vector3.Cross(_character.transform.forward, velocity);
         var sign = Mathf.Sign(cross.y);
 
-        _animator.SetFloat("VelocityZ", cross.magnitude * -sign, 0.6f, Time.deltaTime);
+        _animator.SetFloat(VelocityYName, cross.magnitude * -sign, 0.6f, Time.deltaTime);
     }
 }
