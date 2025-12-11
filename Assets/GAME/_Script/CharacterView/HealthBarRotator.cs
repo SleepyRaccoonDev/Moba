@@ -38,12 +38,12 @@ public class HealthBarController : IViewBehaviour
 
     private void ChangeCapacity()
     {
-        _image.fillAmount = _character.CurrentHP / _maxHealh;
+        _image.fillAmount = _character.Health / _maxHealh;
     }
 
     private void ChangeColor()
     {
-        if (_character.CurrentHP / _maxHealh < .3f)
+        if (_character.Health / _maxHealh < .3f)
             _image.color = Color.red;
         else
             _image.color = Color.green;

@@ -1,16 +1,17 @@
 using UnityEngine;
 
-public class PhysicRotator : IPhysicBehaviour
+public class PhysicRotator
 {
     private Rigidbody _rigidbody;
     private float _forceRotation;
 
-    public PhysicRotator(float speedRotation)
-    {   
+    public PhysicRotator(Rigidbody rigidbody, float speedRotation)
+    {
+        _rigidbody = rigidbody;
         _forceRotation = speedRotation;
     }
 
-    public void Perform(Vector3 moveDirection)
+    public void Rotate(Vector3 moveDirection)
     {
         _rigidbody.angularVelocity = Vector3.zero;
 
@@ -25,6 +26,4 @@ public class PhysicRotator : IPhysicBehaviour
 
         _rigidbody.AddTorque(_rigidbody.transform.up * normalized * _forceRotation, ForceMode.Acceleration);
     }
-
-    public void SetRigitbody(Rigidbody rigidbody) => _rigidbody = rigidbody;
 }

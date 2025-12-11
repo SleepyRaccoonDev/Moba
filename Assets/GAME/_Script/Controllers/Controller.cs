@@ -9,6 +9,9 @@ public abstract class Controller
     
     public virtual void Disable() => _isEnable = false;
 
+    public virtual Vector3 TargetPoint { get; protected set; }
+    public virtual float StopDistance { get; protected set; }
+
     public void OnUpdate(Vector3 targetPosition)
     {
         if (_isEnable == false)

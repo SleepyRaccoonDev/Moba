@@ -1,48 +1,68 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class Character : MonoBehaviour
+[RequireComponent(typeof(Rigidbody),typeof(CapsuleCollider))]
+public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
 {
-    private float _maxHP;
-    private IPhysicBehaviour[] _physicBehaviours;
-
-    public Rigidbody Rigidbody { get; private set; }
+    [field: SerializeField] public Rigidbody Rigidbody { get; private set; }
+    [field: SerializeField] public CapsuleCollider Collider { get; private set; }
     public Animator Animator { get; private set; }
-    [field: SerializeField] public float CurrentHP { get; private set; }
-    public bool IsTakedDamage { get; private set; }
+    public float Health { get; private set; }
+    public bool IsTakingDamage { get; set; }
 
-    public void Initialize(float maxHP, params IPhysicBehaviour[] behaviours)
+    private PhysicMover _mover;
+    private PhysicRotator _rotator;
+
+    private Vector3 _moveDirection;
+    private Vector3 _rotateDirection;
+
+    private void Awake()
     {
+        Collider = GetComponent<CapsuleCollider>();
         Rigidbody = GetComponent<Rigidbody>();
-        Animator = GetComponentInChildren<Animator>();
-        _physicBehaviours = behaviours;
-        _maxHP = CurrentHP = maxHP;
+        
     }
 
-    public void UpdateBehaviors(Vector3 direction)
+    public void Initialize(float maxHP, PhysicMover mover, PhysicRotator rotator)
     {
-        if (IsTakedDamage)
+        Animator = GetComponentInChildren<Animator>();
+
+        Health = maxHP;
+
+        _mover = mover;
+        _rotator = rotator;
+    }
+
+    private void Update()
+    {
+        if (IsTakingDamage)
             return;
 
-        foreach (var behaviour in _physicBehaviours)
-            behaviour.Perform(direction);
+        _mover.Move(_moveDirection);
+        _rotator.Rotate(_rotateDirection);
     }
+
+    public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
+    public void SetRotateDirection(Vector3 direction) => _rotateDirection = direction;
 
     public void TakeDamage(float damage)
     {
         if (damage < 0)
             return;
 
-        IsTakedDamage = true;
+        IsTakingDamage = true;
 
-        CurrentHP -= damage;
+        Health -= damage;
 
-        if (CurrentHP < 0)
-            CurrentHP = 0;
+        if (Health <= 0)
+        {
+            SetDeadState();
+            Health = 0;
+        }
     }
 
-    public void ResetDamageFlag()
+    private void SetDeadState()
     {
-        IsTakedDamage = false;
+        Rigidbody.isKinematic = true;
+        Collider.isTrigger = true;
     }
 }

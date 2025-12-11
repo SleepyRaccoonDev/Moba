@@ -1,19 +1,21 @@
 using UnityEngine;
 
-public class PhysicMover : IPhysicBehaviour
+public class PhysicMover
 {
     private Rigidbody _rigidbody;
     private float _forceMove;
 
-    public PhysicMover(float speedRotation)
+    public PhysicMover(Rigidbody rigidbody, float forceMove)
     {
-        _forceMove = speedRotation;
+        _rigidbody = rigidbody;
+        _forceMove = forceMove;
     }
 
-    public void Perform(Vector3 direction)
-    {
-        _rigidbody.velocity = direction * _forceMove;
-    }
+    public Vector3 CurrentVelocity { get; private set; }
 
-    public void SetRigitbody(Rigidbody rigidbody) => _rigidbody = rigidbody;
+    public void Move(Vector3 direction)
+    {
+        CurrentVelocity = direction * _forceMove;
+        _rigidbody.velocity = CurrentVelocity;
+    }
 }

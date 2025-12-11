@@ -1,22 +1,14 @@
 
 public class CharacterCreator
 {
-    private Controller _controller;
-
-    public CharacterCreator(Character character, Controller controller, float maxHP,
-        params IPhysicBehaviour[] physicBehaviours)
+    public Controller Create(Character character, Controller controller, float maxHP, float ForceMove, float forceRotate)
     {
-        character.Initialize(maxHP, physicBehaviours);
+        character.Initialize(maxHP, new PhysicMover(character.Rigidbody, ForceMove), new PhysicRotator(character.Rigidbody, forceRotate));
 
         controller.Enable();
 
-        _controller = controller;
-
-        foreach (var behaviour in physicBehaviours)
-            behaviour.SetRigitbody(character.Rigidbody);
+        return controller;
     }
-
-    public Controller GetCharacterController() => _controller;
 
     public CharacterView GetCharacterView(params IViewBehaviour[] viewBehaviours) => new CharacterView(viewBehaviours);
 }

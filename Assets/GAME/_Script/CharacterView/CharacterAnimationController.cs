@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class CharacterAnimationController : IViewBehaviour
+public class CharacterAnimationController  : IViewBehaviour
 {
     private const string HitAnimationName = "Zombie Reaction Hit";
     private const string HitTriggerName = "IsHeated";
     private const string DieBoolName = "IsDied";
-    private const string VelocityXName = "VelocityX";
-    private const string VelocityYName = "VelocityZ";
+    private const string VelocityXKey = "VelocityX";
+    private const string VelocityYKey = "VelocityZ";
 
     private Character _character;
     private Animator _animator;
@@ -37,11 +37,6 @@ public class CharacterAnimationController : IViewBehaviour
         ProcessMovementAnimation();
     }
 
-    private void SetDeadState()
-    {
-        _character.Rigidbody.isKinematic = true;
-    }
-
     private bool ProcessHitAnimation(AnimatorStateInfo state)
     {
         if (_isHitPlaying)
@@ -49,13 +44,12 @@ public class CharacterAnimationController : IViewBehaviour
             if (state.IsName(HitAnimationName) && state.normalizedTime >= 1f)
             {
                 _isHitPlaying = false;
-                _character.ResetDamageFlag();
             }
 
             return true;
         }
 
-        if (_character.IsTakedDamage)
+        if (_character.IsTakingDamage)
         {
             _animator.SetTrigger(HitTriggerName);
             _isHitPlaying = true;
@@ -67,10 +61,9 @@ public class CharacterAnimationController : IViewBehaviour
 
     private bool ProcessDeathState()
     {
-        if (_character.CurrentHP <= 0)
+        if (_character.Health <= 0)
         {
             _animator.SetBool(DieBoolName, true);
-            SetDeadState();
             return true;
         }
 
@@ -79,7 +72,7 @@ public class CharacterAnimationController : IViewBehaviour
 
     private void UpdateLowHPLayer()
     {
-        bool lowHP = _character.CurrentHP / _maxHP <= .3f;
+        bool lowHP = _character.Health / _maxHP <= .3f;
         _animator.SetLayerWeight(1, lowHP ? 1 : 0);
     }
 
@@ -88,11 +81,11 @@ public class CharacterAnimationController : IViewBehaviour
         var velocity = _character.Rigidbody.velocity;
 
         float angle = Vector3.Dot(_character.transform.forward, velocity.normalized);
-        _animator.SetFloat(VelocityXName, velocity.magnitude * angle);
+        _animator.SetFloat(VelocityXKey, velocity.magnitude * angle);
 
         var cross = Vector3.Cross(_character.transform.forward, velocity);
         var sign = Mathf.Sign(cross.y);
 
-        _animator.SetFloat(VelocityYName, cross.magnitude * -sign, 0.6f, Time.deltaTime);
+        _animator.SetFloat(VelocityYKey, cross.magnitude * -sign, 0.6f, Time.deltaTime);
     }
 }
