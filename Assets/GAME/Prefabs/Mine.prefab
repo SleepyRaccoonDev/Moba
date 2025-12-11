@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e1741397f9d348afaa09058d0f6b3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _radius: 2
+  _radius: 2.5
   _layerMask:
     serializedVersion: 2
     m_Bits: 192
@@ -56,7 +56,7 @@ MonoBehaviour:
   - {fileID: 5219418096027740681}
   _minDamage: 20
   _maxDamage: 50
-  _timeToExplose: 3
+  _timeToExplose: 0.5
 --- !u!65 &5031743879285440407
 BoxCollider:
   m_ObjectHideFlags: 0
