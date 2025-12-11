@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody),typeof(CapsuleCollider))]
 public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
 {
     [field: SerializeField] public Rigidbody Rigidbody { get; private set; }
     [field: SerializeField] public CapsuleCollider Collider { get; private set; }
+    [field: SerializeField] public NavMeshAgent NavMeshAgent { get; private set; }
     public Animator Animator { get; private set; }
     public float Health { get; private set; }
     public bool IsTakingDamage { get; set; }
@@ -19,12 +21,13 @@ public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
     {
         Collider = GetComponent<CapsuleCollider>();
         Rigidbody = GetComponent<Rigidbody>();
-        
+        NavMeshAgent = GetComponent<NavMeshAgent>();
     }
 
     public void Initialize(float maxHP, PhysicMover mover, PhysicRotator rotator)
     {
         Animator = GetComponentInChildren<Animator>();
+ 
 
         Health = maxHP;
 
@@ -32,7 +35,7 @@ public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
         _rotator = rotator;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (IsTakingDamage)
             return;

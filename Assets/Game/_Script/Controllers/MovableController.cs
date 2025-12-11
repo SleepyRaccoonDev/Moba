@@ -40,7 +40,7 @@ public class MovableController : NavMeshController
 
         if (Physics.Raycast(ray, out _hit, _maxDistanceForRay, _mask) == false)
         {
-            TargetPoint = Vector3.zero;
+            TargetPoint = _movable.Rigidbody.position;
         }
         else
         {
