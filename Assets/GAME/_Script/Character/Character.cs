@@ -1,21 +1,31 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody),typeof(CapsuleCollider))]
-public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
+public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable, IJumpable, IHealable
 {
-    [field: SerializeField] public Rigidbody Rigidbody { get; private set; }
-    [field: SerializeField] public CapsuleCollider Collider { get; private set; }
-    [field: SerializeField] public NavMeshAgent NavMeshAgent { get; private set; }
-    public Animator Animator { get; private set; }
-    public float Health { get; private set; }
-    public bool IsTakingDamage { get; set; }
-
     private PhysicMover _mover;
     private PhysicRotator _rotator;
+    private Jumper _jumper;
 
     private Vector3 _moveDirection;
     private Vector3 _rotateDirection;
+
+    private float _maxHP;
+
+    [field: SerializeField] public AnimationCurve JumpCurve { get; private set; }
+    [field: SerializeField] public Rigidbody Rigidbody { get; private set; }
+    [field: SerializeField] public CapsuleCollider Collider { get; private set; }
+    [field: SerializeField] public NavMeshAgent NavMeshAgent { get; private set; }
+
+    public Animator Animator { get; private set; }
+    public float Health { get; private set; }
+
+    public bool IsTakingDamage { get; set; }
+    public bool IsOnJumpProcess { get; private set; }
+    public bool IsDead { get; private set; }
+    public bool IsInJumpProcess { get; private set; }
 
     private void Awake()
     {
@@ -24,15 +34,19 @@ public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
         NavMeshAgent = GetComponent<NavMeshAgent>();
     }
 
-    public void Initialize(float maxHP, PhysicMover mover, PhysicRotator rotator)
+    public void Initialize(float maxHP, PhysicMover mover, PhysicRotator rotator, Jumper jumper)
     {
         Animator = GetComponentInChildren<Animator>();
- 
+        NavMeshAgent.updateRotation = false;
+        NavMeshAgent.updatePosition = false;
+        NavMeshAgent.updateUpAxis = false;
 
         Health = maxHP;
+        _maxHP = maxHP;
 
         _mover = mover;
         _rotator = rotator;
+        _jumper = jumper;
     }
 
     private void FixedUpdate()
@@ -67,5 +81,23 @@ public class Character : MonoBehaviour, IDamageable, IMovable, IRotetable
     {
         Rigidbody.isKinematic = true;
         Collider.isTrigger = true;
+        
+    }
+
+    public void Jump(OffMeshLinkData linkData)
+    {
+        IsInJumpProcess = true;
+        StartCoroutine( _jumper.Jump(linkData));
+    }
+
+    public void ResetJump()
+    {
+        IsInJumpProcess = false;
+    }
+
+    public void Heal(float value)
+    {
+        Health += value;
+        Health = _maxHP < Health ? _maxHP : Health;
     }
 }

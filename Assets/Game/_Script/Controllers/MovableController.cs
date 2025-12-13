@@ -13,25 +13,14 @@ public class MovableController : NavMeshController
     private RaycastHit _hit;
     private LayerMask _mask;
 
-    public MovableController(IMovable movable, int agentTypeID) : base (movable, agentTypeID)
+    public MovableController(IMovable movable, IJumpable jumpable, int agentTypeID) :
+        base (movable, jumpable, agentTypeID)
     {
         _movable = movable;
-
-        StopDistance = movable.Collider.radius + .1f;
 
         _camera = Camera.main;
 
         _mask = LayerMask.GetMask(KeyForRayMask);
-    }
-
-    protected override void UpdateInputsLogic(Vector3 targetPosition)
-    {
-        SetTatgetPoint(targetPosition);
-    }
-
-    protected override void UpdateBehaviourLogic()
-    {
-        _movable.SetMoveDirection(GetDirection());
     }
 
     protected override void SetTatgetPoint(Vector3 targetPosition)

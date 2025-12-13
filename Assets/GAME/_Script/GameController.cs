@@ -24,15 +24,29 @@ public class GameController : MonoBehaviour
     [SerializeField] private Image _imageHP;
 
     [Header("Mine")]
-    [SerializeField] private GameObject _minePrefab;
+    [SerializeField] private Mine _minePrefab;
     [SerializeField] private Transform _spawnField;
-    
+
+    [Header("AidSpawner")]
+    [SerializeField] private Aid _aidPrefab;
+    [SerializeField] private float _spawnDistance;
+    [SerializeField] private float _spawnTimer;
+    [SerializeField] private float _healthToRestore;
+
+    [Header("Sounds")]
+    [SerializeField] private AudioSource _soundsSource;
+    [SerializeField] private AudioClip _takeSound;
+    [SerializeField] private AudioClip _explosiveSound;
+    [SerializeField] private AudioSource _musicSource;
+
     private Controller _controller;
     private CharacterView _characterView;
     private InputsController _inputController;
 
     private List<Controller> _controllersEnemy = new List<Controller>();
     private List<CharacterView> _enemyViews = new List<CharacterView>();
+
+    private AidSpawner _aidSpawner;
 
     private void Awake()
     {
@@ -44,13 +58,18 @@ public class GameController : MonoBehaviour
 
         SetEnemySettings(characterCreator);
 
-        new MineSpawner(_spawnField, _minePrefab).Spawn() ;
+        new MineSpawner(_spawnField, _minePrefab, _soundsSource, _explosiveSound).Spawn() ;
+
+        _aidSpawner = new AidSpawner(_player, _aidPrefab, _soundsSource, _spawnDistance, _spawnTimer, _healthToRestore, _takeSound);
     }
 
     private void Update()
     {
         if (_inputController.IsLeftMouseButtonDown())
             _controller.OnUpdate(_inputController.GetMousePosition());
+
+        if (_inputController.IsSpawnAidButtonPressed())
+            _aidSpawner.ActivateSpawner();
 
         foreach (var controllerEnemy in _controllersEnemy)
             controllerEnemy.OnUpdate(_player.transform.position);
@@ -74,7 +93,7 @@ public class GameController : MonoBehaviour
         _controller = characterCreator.Create(
             _player,
             new CompositController(
-                new MovableController(_player, 0),
+                new MovableController(_player, _player, 0),
                 new RotatableController(_player)),
             _maxHP, _forceMove, _forceRotate);
 
@@ -92,7 +111,7 @@ public class GameController : MonoBehaviour
             _controllersEnemy.Add(characterCreator.Create(
                 enemy,
                 new CompositController(
-                    new NavMeshController(enemy, 0),
+                    new NavMeshController(enemy, enemy, 0),
                     new RotatableController(enemy)),
                 _maxHPEnemyMin,
                 Random.Range(_forceMoveEnemyMin, _forceMoveEnemyMax),

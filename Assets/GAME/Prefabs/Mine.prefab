@@ -56,7 +56,7 @@ MonoBehaviour:
   - {fileID: 5219418096027740681}
   _minDamage: 20
   _maxDamage: 50
-  _timeToExplose: 0.5
+  _timeToExplose: 1.5
 --- !u!65 &5031743879285440407
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class CharacterAnimationController  : IViewBehaviour
 {
-    private const string HitAnimationName = "Zombie Reaction Hit";
-    private const string HitTriggerName = "IsHeated";
-    private const string DieBoolName = "IsDied";
-    private const string VelocityXKey = "VelocityX";
-    private const string VelocityYKey = "VelocityZ";
+    private readonly int HitAnimationName = Animator.StringToHash("Zombie Reaction Hit");
+    private readonly int HitTriggerName = Animator.StringToHash("IsHeated");
+    private readonly int DieBoolName = Animator.StringToHash("IsDied");
+    private readonly int VelocityXKey = Animator.StringToHash("VelocityX");
+    private readonly int VelocityYKey = Animator.StringToHash("VelocityZ");
+    private readonly int InJumpProcessKey = Animator.StringToHash("InJumpProcess");
 
     private Character _character;
     private Animator _animator;
@@ -24,6 +25,8 @@ public class CharacterAnimationController  : IViewBehaviour
 
     public void Perform()
     {
+        _animator.SetBool(InJumpProcessKey, _character.IsInJumpProcess);
+
         var state = _animator.GetCurrentAnimatorStateInfo(0);
 
         if (ProcessDeathState())
@@ -41,7 +44,7 @@ public class CharacterAnimationController  : IViewBehaviour
     {
         if (_isHitPlaying)
         {
-            if (state.IsName(HitAnimationName) && state.normalizedTime >= 1f)
+            if (state.shortNameHash == HitAnimationName && state.normalizedTime >= 1f)
             {
                 _isHitPlaying = false;
             }

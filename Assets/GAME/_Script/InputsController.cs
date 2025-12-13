@@ -13,4 +13,9 @@ public class InputsController
     {
         return Input.GetMouseButton(LeftMouseButtonIndex);
     }
+
+    public bool IsSpawnAidButtonPressed()
+    {
+        return Input.GetKeyDown(KeyCode.F);
+    }
 }

@@ -18,12 +18,21 @@ public class Mine : MonoBehaviour
 
     private Coroutine _currentProcess;
 
+    private AudioSource _audioSource;
+    private AudioClip _audio;
+
     private void Update()
     {
         if (_currentProcess == null && TargetDetector(out List<IDamageable> targets))
         {
             _currentProcess = StartCoroutine(ExplosiveProcess());
         }
+    }
+
+    public void Initialize(AudioSource audioSource, AudioClip audio)
+    {
+        _audioSource = audioSource;
+        _audio = audio;
     }
 
     private IEnumerator ExplosiveProcess()
@@ -41,6 +50,8 @@ public class Mine : MonoBehaviour
             foreach (var target in targets)
                 target.TakeDamage(Random.Range(_minDamage, _maxDamage));
         }
+
+        _audioSource.PlayOneShot(_audio);
 
         foreach (var effect in _effects)
         {
